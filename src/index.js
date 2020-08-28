@@ -13,19 +13,54 @@ const client = axios.create({
 });
 
 bot.on("message", async (msg) => {
-  if (msg.content.startsWith("q:")) {
-    await addQuestion(msg);
-  } else if (msg.content.startsWith("> q:")) {
-    await addAnswer(msg);
+  if (msg.author.bot) return;
+
+  if (msg.content.startsWith("D!")) {
+    await setUpBot(msg);
   }
+
+  try {
+    if (msg.content.startsWith("q:")) {
+      await addQuestion(msg);
+      msg.react("✍️");
+    } else if (msg.content.startsWith("> q:")) {
+      await addAnswer(msg);
+      msg.react("✍️");
+    }
+  } catch {
+    console.log("something broke");
+  }
+
 });
 
+bot.on("guildCreate", (guild) => {
+  console.log("Joined a new guild: " + guild.name);
+  console.log(guild);
+
+  let channelID;
+  let channels = [...guild.channels.cache];
+  for (let c of channels) {
+    let channelType = c[1].type;
+    if (channelType === "text") {
+      channelID = c[0];
+      break;
+    }
+  }
+  const channel = bot.channels.cache.get(guild.systemChannelID || channelID);
+  channel.send("Thanks for inviting me! Set me up by running D!");
+  //Your other stuff like adding to guildArray
+});
+
+
+async function setupBot() {
+  
+}
 async function addQuestion(msg) {
   const { parentID: server } = msg.channel;
   const { id: author } = msg.author;
   const { id: discordMsgId } = msg;
   const text = msg.content.match(qnaparser)[1];
-  client
+  await client
     .post(`question`, {
       author,
       text,
@@ -61,5 +96,4 @@ async function addAnswer(msg) {
   } catch (e) {
     console.log(e);
   }
-
 }
