@@ -1,0 +1,23 @@
+version: "3"
+services:
+  mongo:
+    image: "mongo"
+    ports: 
+      - "27017:27017"
+    volumes:
+      - "ddocs-bot_database:/data/db"
+    restart: always
+  bot:
+    image: pepe
+    restart: always
+    ports:
+      - "5000:5000"
+    depends_on: 
+      - "mongo"
+    volumes:
+      - "./:/usr/src/app"
+      - "reserved:/usr/src/app/node_modules"
+volumes:
+    ddocs-bot_database:
+      external: true
+    reserved:

@@ -1,10 +1,15 @@
+console.log('pepe');
 import "dotenv/config";
 
 import discord from "discord.js";
 import axios from "axios";
 
 const bot = new discord.Client();
-bot.login(process.env.BOT_TOKEN);
+try {
+  bot.login(process.env.BOT_TOKEN);
+} catch (e) {
+  console.log(e);
+}
 
 const qnaparser = new RegExp(/[qQaA]:(.*)/);
 
@@ -51,7 +56,7 @@ function shouldHandle(msg) {
 }
 
 bot.on("message", async (msg) => {
-  if (!shouldHandle) return;
+  if (!shouldHandle(msg)) return;
 
   for (let commandKey in commands) {
     const command = commands[commandKey];
