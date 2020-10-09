@@ -1,4 +1,3 @@
-console.log("pepe");
 import "dotenv/config";
 
 import discord, { MessageEmbed } from "discord.js";
@@ -26,35 +25,35 @@ const Command = {
 
 const commands = {
   [Command.Help]: {
-    name: Command.Help,
+    name: 'Help',
     handler: help,
     condition: (msg) => msg.content.startsWith("help!"),
     message: `Get help about the commands of the bot`,
   },
-  [Command.AddQuestion]: {
-    name: Command.AddQuestion,
-    handler: addQuestion,
-    condition: (msg) => msg.content.startsWith("q:"),
-    message: `
-      In order to ask a question, just start your message with 'q:' and ask your question as you normally would. 
-      If your question is correctly saved a reaction with ✍️ will appear..
-    `,
-  },
-  [Command.AddAnswer]: {
-    name: Command.AddAnswer,
-    handler: addAnswer,
-    condition: (msg) => msg.content.startsWith("> q:"),
-    message: `In order to add an aswer to a question you must use the quote functionality for discord, 
-    If your answer is correctly saved a reaction with ✍️ will appear.`,
-  },
   [Command.Register]: {
-    name: Command.Register,
+    name: 'Register',
     handler: registerBot,
     condition: (msg) => msg.content.startsWith("dd!"),
     message: `To register the bot you must add a BotOwner role on the channel. A user with the BotOwner role 
     has to call 'dd!' to setup the bot. Follow the instructions that appear next, this will allow you to set a
     technology for the discussions made in this server.
     `,
+  },
+  [Command.AddQuestion]: {
+    name: 'Add Question',
+    handler: addQuestion,
+    condition: (msg) => msg.content.startsWith("q:"),
+    message: `
+      In order to ask a question, just start your message with \`q:\` and ask your question as you normally would. 
+      If your question is correctly saved a reaction with ✍️ will appear..
+    `,
+  },
+  [Command.AddAnswer]: {
+    name: 'Answer a Question',
+    handler: addAnswer,
+    condition: (msg) => msg.content.startsWith("> q:"),
+    message: `In order to add an aswer to a question you must use the quote functionality for discord, 
+    If your answer is correctly saved a reaction with ✍️ will appear.`,
   },
 };
 
@@ -107,20 +106,12 @@ async function help(msg) {
        a living knowledge base built upon collaboration from their participants,
        wherever you add or answer a question we'll make sure to save it for you
        and let the next person who comes looking for the information find it easily.`
-    )
-    .addField(
-      "Adding a question",
-      "Make sure you start your message with `q:`"
-    )
-    .addField(
-      "Adding an answer",
-      `If a message is a valid question (i.e. starts with \`q:\`) 
-      just reply to it using the \`Quote\` functionality.`
-    )
-    .addField(
-      "How do I know if my question/answer was added?",
-      `If your message was successfully added, a reaction (✍️) is added to the message.`
     );
+
+    for(let commandTitle in commands) {
+      const command = commands[commandTitle]
+      embed.addField(command.name, command.message);
+    }
 
   msg.channel.send(embed);
 }
