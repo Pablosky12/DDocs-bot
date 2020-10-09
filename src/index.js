@@ -1,7 +1,7 @@
-console.log('pepe');
+console.log("pepe");
 import "dotenv/config";
 
-import discord from "discord.js";
+import discord, { MessageEmbed } from "discord.js";
 import axios from "axios";
 
 const bot = new discord.Client();
@@ -18,12 +18,19 @@ const client = axios.create({
 });
 
 const Command = {
+  Help: 0,
   AddQuestion: 1,
   AddAnswer: 2,
   Register: 3,
 };
 
 const commands = {
+  [Command.Help]: {
+    name: Command.Help,
+    handler: help,
+    condition: (msg) => msg.content.startsWith("help!"),
+    message: `Get help about the commands of the bot`,
+  },
   [Command.AddQuestion]: {
     name: Command.AddQuestion,
     handler: addQuestion,
@@ -64,7 +71,6 @@ bot.on("message", async (msg) => {
       console.log(`entered condition ${command.name}`);
       try {
         command.handler(msg);
-        msg.react("✍️");
       } catch (e) {
         console.error(`Something exploded while handling ${command.name}`);
         console.error(e);
@@ -88,11 +94,39 @@ bot.on("guildCreate", (guild) => {
     }
   }
   const channel = bot.channels.cache.get(guild.systemChannelID || channelID);
-  channel.send("Thanks for inviting me! Set me up by running D!");
+  channel.send("Thanks for inviting me! Set me up by running dd!");
   //Your other stuff like adding to guildArray
 });
 
+async function help(msg) {
+  const embed = new MessageEmbed()
+    .setTitle("How to use Breedge")
+    .setColor(0xcc0099)
+    .setDescription(
+      `Breedge is a Discord bot and platform that helps communities create
+       a living knowledge base built upon collaboration from their participants,
+       wherever you add or answer a question we'll make sure to save it for you
+       and let the next person who comes looking for the information find it easily.`
+    )
+    .addField(
+      "Adding a question",
+      "Make sure you start your message with `q:`"
+    )
+    .addField(
+      "Adding an answer",
+      `If a message is a valid question (i.e. starts with \`q:\`) 
+      just reply to it using the \`Quote\` functionality.`
+    )
+    .addField(
+      "How do I know if my question/answer was added?",
+      `If your message was successfully added, a reaction (✍️) is added to the message.`
+    );
+
+  msg.channel.send(embed);
+}
+
 async function registerBot() {}
+
 async function addQuestion(msg) {
   const { parentID: server } = msg.channel;
   const { id: author } = msg.author;
@@ -105,6 +139,7 @@ async function addQuestion(msg) {
     discordMsgId,
     tech: 1,
   });
+  msg.react("✍️");
 }
 
 async function addAnswer(msg) {
@@ -126,4 +161,5 @@ async function addAnswer(msg) {
     tech: question.qtech,
     questionId: question.qid,
   });
+  msg.react("✍️");
 }
